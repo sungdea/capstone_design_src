@@ -30,6 +30,8 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.PACKAGE_REPLACED"/>
+                <data android:scheme="package" android:path="com.a2013myway.team.capstonedesign"/>
             </intent-filter>
         </receiver>
     </application>
