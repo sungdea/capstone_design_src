@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CapstoneDesign.iml" filepath="$PROJECT_DIR$/CapstoneDesign.iml" />
+      <module fileurl="file://C:\Users\user\Documents\GitHub\capstone_design_src\Android\CapstoneDesign\CapstoneDesign.iml" filepath="C:\Users\user\Documents\GitHub\capstone_design_src\Android\CapstoneDesign\CapstoneDesign.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\user\Documents\GitHub\capstone_design_src\Android\CapstoneDesign\app\app.iml" filepath="C:\Users\user\Documents\GitHub\capstone_design_src\Android\CapstoneDesign\app\app.iml" />
     </modules>
   </component>
 </project>
