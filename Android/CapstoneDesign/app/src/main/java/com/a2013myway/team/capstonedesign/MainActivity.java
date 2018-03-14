@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity implements OnInitListener {
         setContentView(R.layout.activity_main);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         myTTS = new TextToSpeech(this, this);
     }
     public void onInit(int status) {
@@ -26,6 +27,9 @@ public class MainActivity extends AppCompatActivity implements OnInitListener {
     protected void onDestroy() {
         super.onDestroy();
         myTTS.shutdown();
+=======
+
+>>>>>>> e7db5ed6a429600717e492f7dd6ac77efe3474d5
 =======
 
 >>>>>>> e7db5ed6a429600717e492f7dd6ac77efe3474d5
