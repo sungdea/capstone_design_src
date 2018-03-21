@@ -5,6 +5,8 @@ modified by LSH
 
 package com.a2013myway.team.capstonedesign;
 
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,12 +25,12 @@ speak 메서드를 이용하면 된다.
 public class MainActivity extends AppCompatActivity{
 
     private TextToSpeech textToSpeech;
+    private BluetoothManager bluetoothManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
