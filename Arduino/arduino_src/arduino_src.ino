@@ -66,18 +66,20 @@ void readTag(){
 void BLEsetup(){ 
   BLE.begin();
   BLE.setLocalName("RFID Tag");
-  BLE.setAdvertisedService(TagService);
+  BLE.setAdvertisedService(tagService);
 
   tagService.addCharacteristic(tagTransferCharacteristic);
   BLE.addService(tagService);
 
-  switchCharacteristic.setValue(0);
+  tagTransferCharacteristic.setValue(0);
   BLE.advertise();
 }
 
 boolean BLEconnect(){
-  if(central.connected()) return;
-  else central = BLE.central();
+  while(true){
+  central = BLE.central();
+  if(central.connected()) break;  
+  };
 }
 
 void updateTagId(){
