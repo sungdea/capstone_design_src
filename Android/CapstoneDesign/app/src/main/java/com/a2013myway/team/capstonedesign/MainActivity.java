@@ -22,7 +22,7 @@ TextToSpeech 객체를 생성하고 밑과 같이 동적할당 해준 뒤에
 speak 메서드를 이용하면 된다.
  */
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     private TextToSpeech textToSpeech;
     private BluetoothManager bluetoothManager;
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+/*
         textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
@@ -49,5 +49,6 @@ public class MainActivity extends AppCompatActivity{
                 textToSpeech.speak("test".toString(),TextToSpeech.QUEUE_FLUSH,null,utteranceId);
             }
         });
+    }*/ //0324 삭제했음
     }
 }
