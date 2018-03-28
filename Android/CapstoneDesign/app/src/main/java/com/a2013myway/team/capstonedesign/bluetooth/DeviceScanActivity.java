@@ -24,6 +24,8 @@ import com.a2013myway.team.capstonedesign.R;
 
 import java.util.ArrayList;
 
+import static com.a2013myway.team.capstonedesign.R.*;
+
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
@@ -40,13 +42,13 @@ public class DeviceScanActivity extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getActionBar().setTitle(R.string.title_devices);
+        getActionBar().setTitle(string.title_devices);
         mHandler = new Handler();
 
         // Use this check to determine whether BLE is supported on the device.  Then you can
         // selectively disable BLE-related features.
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, string.ble_not_supported, Toast.LENGTH_SHORT).show();
             finish();
         }
 
@@ -58,12 +60,6 @@ public class DeviceScanActivity extends ListActivity {
 
         // Checks if Bluetooth is supported on the device.
 
-        //0324 블루투스자동on때문에삭제함 밑4줄
-      /*  if (mBluetoothAdapter == null) {
-            Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }*/
 
 
       //20180324 오후1112 어플실행시 자동으로 블루투스 경고문안뜨고 바로실행되는코드 삽입
@@ -92,14 +88,14 @@ public class DeviceScanActivity extends ListActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         if (!mScanning) {
-            menu.findItem(R.id.menu_stop).setVisible(false);
-            menu.findItem(R.id.menu_scan).setVisible(true);
-            menu.findItem(R.id.menu_refresh).setActionView(null);
+            menu.findItem(id.menu_stop).setVisible(false);
+            menu.findItem(id.menu_scan).setVisible(true);
+            menu.findItem(id.menu_refresh).setActionView(null);
         } else {
-            menu.findItem(R.id.menu_stop).setVisible(true);
-            menu.findItem(R.id.menu_scan).setVisible(false);
-            menu.findItem(R.id.menu_refresh).setActionView(
-                    R.layout.actionbar_indeterminate_progress);
+            menu.findItem(id.menu_stop).setVisible(true);
+            menu.findItem(id.menu_scan).setVisible(false);
+            menu.findItem(id.menu_refresh).setActionView(
+                    layout.actionbar_indeterminate_progress);
         }
         return true;
     }
@@ -107,11 +103,11 @@ public class DeviceScanActivity extends ListActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_scan:
+            case id.menu_scan:
                 mLeDeviceListAdapter.clear();
                 scanLeDevice(true);
                 break;
-            case R.id.menu_stop:
+            case id.menu_stop:
                 scanLeDevice(false);
                 break;
         }
@@ -236,10 +232,10 @@ public class DeviceScanActivity extends ListActivity {
             ViewHolder viewHolder;
             // General ListView optimization code.
             if (view == null) {
-                view = mInflator.inflate(R.layout.listitem_device, null);
+                view = mInflator.inflate(layout.listitem_device, null);
                 viewHolder = new ViewHolder();
-                viewHolder.deviceAddress = (TextView) view.findViewById(R.id.device_address);
-                viewHolder.deviceName = (TextView) view.findViewById(R.id.device_name);
+                viewHolder.deviceAddress = (TextView) view.findViewById(id.device_address);
+                viewHolder.deviceName = (TextView) view.findViewById(id.device_name);
                 view.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) view.getTag();
@@ -250,7 +246,7 @@ public class DeviceScanActivity extends ListActivity {
             if (deviceName != null && deviceName.length() > 0)
                 viewHolder.deviceName.setText(deviceName);
             else
-                viewHolder.deviceName.setText(R.string.unknown_device);
+                viewHolder.deviceName.setText(string.unknown_device);
             viewHolder.deviceAddress.setText(device.getAddress());
 
             return view;

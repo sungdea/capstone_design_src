@@ -1,42 +1,77 @@
 #include <SoftwareSerial.h>
 #include <CurieBLE.h>
 
-BLEService tagService("19B10000-E8F2-537E-4F6C-D104768A1214"); 
-BLEUnsignedCharCharacteristic tagTransferCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLENotify);
-BLEDevice central;
-SoftwareSerial rSerial(2,3) // RX, TX
+SoftwareSerial rSerial(2,3); // RX, TX
 
 const int tagLen = 16;  // RFID tag full length
 const int idLen = 13;   // RFID tag ID length
 
-char tagId[idLen];
+unsigned char IDValue[idLen];
+
+BLEService RFIDSvc("03B80E5A-EDE8-4B33-A751-6CE34EC4C700"); // create service
+
+// create switch characteristic and allow remote device to read
+BLECharacteristic IDChar("7772E5DB-3868-4112-A1A9-F2669D106BF3", BLENotify | BLERead,idLen);
 
 void readTag();
-void BLEsetup();
-boolean BLEconnect();
-void updateTagId();
+void BLESetup();
+void DeviceConnectHandler(BLEDevice central);
+void DeviceDisconnectHandler(BLEDevice central);
 
 void setup() {
   Serial.begin(9600);
   rSerial.begin(9600);
-
-  BLEsetup();
+ 
+  BLESetup();
+  
+  // advertise the service
+  BLE.advertise();
+  Serial.println(("Bluetooth device active, waiting for connections..."));
 }
 
 void loop() {
-
-  if(!BLEconnect()) return;
-
   readTag();
 
-  if(strlen(newtag) == 0) return; // If there is no data to read, return
+  if(strlen((char*)IDValue) == 0) return; // If there is no data to read, return
   else{
-    updateTagId();
+    IDChar.setValue(IDValue,idLen);
   }
   
   for (int i=0; i < idLen; i++) {
-    newTag[i] = 0;
+    IDValue[i] = 0;
   }
+}
+
+void BLESetup()
+{
+  BLE.begin();
+  // set the local name peripheral advertises
+  BLE.setLocalName("RFID tag");
+
+  // set the UUID for the service this peripheral advertises
+  BLE.setAdvertisedServiceUuid(RFIDSvc.uuid());
+
+  // add service and characteristic
+  RFIDSvc.addCharacteristic(IDChar);
+  BLE.addService(RFIDSvc);
+
+  // assign event handlers for connected, disconnected to peripheral
+  BLE.setEventHandler(BLEConnected, DeviceConnectHandler);
+  BLE.setEventHandler(BLEDisconnected, DeviceDisconnectHandler);
+
+  IDChar.setValue(IDValue,idLen);
+}
+
+void DeviceConnectHandler(BLEDevice central) {
+  // central connected event handler
+  Serial.print("Connected event, central: ");
+  Serial.println(central.address());
+}
+
+void DeviceDisconnectHandler(BLEDevice central) {
+  // central disconnected event handler
+  Serial.print("Disconnected event, central: ");
+  Serial.println(central.address());
 }
 
 void readTag(){
@@ -54,34 +89,9 @@ void readTag(){
            first one byte(0x02) is STX/start of text, last three byte is CR/carrige return(0x13),
            LF/linefeed(0x10), ETX/end of text. */
         if (readByte != 2 && readByte!= 13 && readByte != 10 && readByte != 3) {
-        newTag[i] = readByte;
+        IDValue[i] = readByte;
         i++;
         }
-
-        if(readByte == 3) tag=false;
     }
   }
-}
-
-void BLEsetup(){ 
-  BLE.begin();
-  BLE.setLocalName("RFID Tag");
-  BLE.setAdvertisedService(tagService);
-
-  tagService.addCharacteristic(tagTransferCharacteristic);
-  BLE.addService(tagService);
-
-  tagTransferCharacteristic.setValue(0);
-  BLE.advertise();
-}
-
-boolean BLEconnect(){
-  while(true){
-  central = BLE.central();
-  if(central.connected()) break;  
-  };
-}
-
-void updateTagId(){
-  tagTransferCharacteristic.setValue(newTag,idLen);
 }
