@@ -12,11 +12,11 @@ BLEService RFIDSvc("03B80E5A-EDE8-4B33-A751-6CE34EC4C700"); // create service
 
 // create switch characteristic and allow remote device to read
 BLECharacteristic IDChar("7772E5DB-3868-4112-A1A9-F2669D106BF3", BLENotify | BLERead,idLen);
-BLEDevice central;
 
 void readTag();
 void BLESetup();
-void updateTagId();
+void DeviceConnectHandler(BLEDevice central);
+void DeviceDisconnectHandler(BLEDevice central);
 
 void setup() {
   Serial.begin(9600);
@@ -30,9 +30,6 @@ void setup() {
 }
 
 void loop() {
-  
-  //BLE.poll();
- 
   readTag();
 
   if(strlen((char*)IDValue) == 0) return; // If there is no data to read, return
@@ -55,7 +52,6 @@ void BLESetup()
   BLE.setAdvertisedServiceUuid(RFIDSvc.uuid());
 
   // add service and characteristic
-  
   RFIDSvc.addCharacteristic(IDChar);
   BLE.addService(RFIDSvc);
 
@@ -94,7 +90,6 @@ void readTag(){
            LF/linefeed(0x10), ETX/end of text. */
         if (readByte != 2 && readByte!= 13 && readByte != 10 && readByte != 3) {
         IDValue[i] = readByte;
-        Serial.println(IDValue[i],HEX);
         i++;
         }
     }
