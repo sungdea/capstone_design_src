@@ -31,10 +31,10 @@ import static com.a2013myway.team.capstonedesign.R.*;
  */
 public class DeviceScanActivity extends ListActivity {
     private LeDeviceListAdapter mLeDeviceListAdapter;
-    private BluetoothAdapter mBluetoothAdapter;
+   // private BluetoothAdapter mBluetoothAdapter; //0324 블루투스자동on때문에삭제함
     private boolean mScanning;
     private Handler mHandler;
-
+    BluetoothAdapter mBluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
@@ -54,17 +54,35 @@ public class DeviceScanActivity extends ListActivity {
 
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
         // BluetoothAdapter through BluetoothManager.
-        final BluetoothManager bluetoothManager =
-                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
+       // final BluetoothManager bluetoothManager =//0324 블루투스자동on때문에삭제함
+            //    (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);//0324 블루투스자동on때문에삭제함
+       // mBluetoothAdapter = bluetoothManager.getAdapter();//0324 블루투스자동on때문에삭제함
 
         // Checks if Bluetooth is supported on the device.
-        if (mBluetoothAdapter == null) {
-            Toast.makeText(this, string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
-            return;
+
+
+
+      //20180324 오후1112 어플실행시 자동으로 블루투스 경고문안뜨고 바로실행되는코드 삽입
+        if(mBluetoothAdapter==null){
+            Toast.makeText(this,"블루투스를 사용할수 없습니다",Toast.LENGTH_LONG).show();
+
         }
+        else
+        {
+            if(mBluetoothAdapter.getState() == BluetoothAdapter.STATE_TURNING_ON ||
+                    mBluetoothAdapter.getState() == mBluetoothAdapter.STATE_ON)
+            {
+                mBluetoothAdapter.disable();//만약 어플을 실행할시 블루투스가 켜져있다면, 끄는기능(아마필요없음)
+            }
+            else
+            {
+                mBluetoothAdapter.enable();
+                Toast.makeText(this,"블루투스 on",Toast.LENGTH_LONG).show();
+            }
+        }//블루투스 전원이 꺼져있다면 안물어보고 블루투스 자동 on,toast로 메세지출력
     }
+//여기까지 20180324 추가됨
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -102,12 +120,14 @@ public class DeviceScanActivity extends ListActivity {
 
         // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
         // fire an intent to display a dialog asking the user to grant permission to enable it.
-        if (!mBluetoothAdapter.isEnabled()) {
+
+        //블루투스 자동on때문에 이하4줄은 삭제됨 0324
+        /* if (!mBluetoothAdapter.isEnabled()) {
             if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
-        }
+        }*/
 
         // Initializes list view adapter.
         mLeDeviceListAdapter = new LeDeviceListAdapter();
