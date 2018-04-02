@@ -34,14 +34,13 @@ TextToSpeech 객체를 생성하고 밑과 같이 동적할당 해준 뒤에
 speak 메서드를 이용하면 된다.
  */
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     //PERMISSION REQUEST CODE
     private static final int PERMISSION_REQUEST = 1;
 
     private BluetoothAdapter bluetoothAdapter;
     private final int ENABLE_BT = 1;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +57,6 @@ public class MainActivity extends AppCompatActivity{
 
             //Toast.makeText(getApplicationContext(),REQUEST_RESULT+"",Toast.LENGTH_SHORT).show();
         }
-
 
         Button button = (Button)findViewById(R.id.btn_connect);
         button.setOnClickListener(new View.OnClickListener() {
