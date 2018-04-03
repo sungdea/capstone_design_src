@@ -32,25 +32,6 @@ public class DetectService extends Service {
         //service 객체와 액티비티 사이에서 통신할 때 사용하는 메서드
         return null;
     }
-    private int TTSFocus(Context context)
-    {
-        AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
-        int focusRequest = audioManager.requestAudioFocus(new AudioManager.OnAudioFocusChangeListener() {
-            @Override
-            public void onAudioFocusChange(int i) {
-                switch (i)
-                {
-                    case AudioManager.AUDIOFOCUS_GAIN:
-                        //오디오 포커스 체인지 리스너 구현
-                }
-            }
-        },AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
-
-        return focusRequest;
-        //AudioManager.AUDIOFOCUS_REQUEST_FAILED = 0
-        //허가는 1
-        //코드에 따라 tts음성 출력 구분할 것
-    }
     @Override
     public void onCreate() {
         super.onCreate();

@@ -9,4 +9,10 @@
         android:layout_height="50dp"
         android:text="블루투스 연결"
         android:id="@+id/btn_connect"/>
+
+    <Button
+        android:id="@+id/speak_btn"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:text="speak" />
 </LinearLayout>

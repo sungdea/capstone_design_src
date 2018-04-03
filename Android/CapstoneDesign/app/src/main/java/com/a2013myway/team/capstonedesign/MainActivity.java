@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private BluetoothAdapter bluetoothAdapter;
     private final int ENABLE_BT = 1;
+    private TTS tts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +82,19 @@ public class MainActivity extends AppCompatActivity {
                 builder.show();
             }
         }
+        //tts speak example
+        tts=new TTS(this,Locale.KOREAN);
+        Button tts_btn=(Button)findViewById(R.id.speak_btn);
+        tts_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tts.speak("안녕하세요");
+            }
+        });
+
     }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
