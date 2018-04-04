@@ -26,11 +26,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".DetectService"
-            android:enabled="true"
-            android:exported="false" />
-
         <receiver
             android:name=".AutoRunReceiver"
             android:enabled="true"
@@ -44,8 +39,6 @@
                     android:scheme="package" />
             </intent-filter>
         </receiver>
-
-        <activity android:name=".DeviceControlActivity" />
 
         <service
             android:name=".BluetoothLeService"
