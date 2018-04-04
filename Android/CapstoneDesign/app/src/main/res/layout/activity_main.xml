@@ -1,16 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.a2013myway.team.capstonedesign.MainActivity">
+    android:layout_margin="10dp">
 
     <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Button"
-        tools:layout_editor_absoluteX="148dp"
-        tools:layout_editor_absoluteY="164dp" />
-</android.support.constraint.ConstraintLayout>
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:text="블루투스 연결"
+        android:id="@+id/btn_connect"/>
+
+    <Button
+        android:id="@+id/speak_btn"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:text="speak" />
+</LinearLayout>
