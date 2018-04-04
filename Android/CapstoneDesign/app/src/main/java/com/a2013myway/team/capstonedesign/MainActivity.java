@@ -55,8 +55,6 @@ public class MainActivity extends AppCompatActivity {
         {
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(intent,ENABLE_BT);
-
-            //Toast.makeText(getApplicationContext(),REQUEST_RESULT+"",Toast.LENGTH_SHORT).show();
         }
 
         Button button = (Button)findViewById(R.id.btn_connect);

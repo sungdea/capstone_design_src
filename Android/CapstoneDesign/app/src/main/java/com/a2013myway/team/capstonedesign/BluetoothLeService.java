@@ -1,5 +1,6 @@
 package com.a2013myway.team.capstonedesign;
 
+import android.app.Notification;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -13,8 +14,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 public class BluetoothLeService extends Service {
@@ -25,9 +30,15 @@ public class BluetoothLeService extends Service {
     private BluetoothGatt mBluetoothGatt;
     private int mConnectionState = STATE_DISCONNECTED;
 
+
+    private TTS tts;
+
     private  static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
+
+    private String DeviceName;
+    private String DeviceAddress = null;
 
     public final static String ACTION_GATT_CONNECTED =
             "com.a2013myway.team.capstonedesign.ACTION_GATT_CONNECTED";
@@ -42,6 +53,57 @@ public class BluetoothLeService extends Service {
 
     //public final static UUID
 
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        DeviceName = intent.getStringExtra("Name");
+        DeviceAddress = intent.getStringExtra("Address");
+        initialize();
+        tts = new TTS(getApplicationContext(), Locale.KOREAN);
+        boolean isconnect = false;
+
+        Log.d("onstartcommand 진입","진입");
+
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        // If there are paired devices
+
+        Log.d("bondnum",pairedDevices.size()+"");
+
+        if(pairedDevices.size()>0)
+        {
+            for(BluetoothDevice device : pairedDevices){ //페어링된 장치 이름과, MAC주소를 가져올 수 있다.
+                if(device.getAddress().equals(DeviceAddress))
+                {
+                    isconnect = connect(device.getAddress(),false);
+                    break;
+                }
+                else
+                {
+                    isconnect = connect(DeviceAddress,true);
+                }
+            }
+        }
+        else{
+            //본딩된 기기가 없는 경우 연결 시 본딩할 수 있도록 함
+            isconnect = connect(DeviceAddress,true);
+        }
+
+
+
+        Log.d("isconnect",isconnect+"");
+
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onCreate() {
+        Notification.Builder builder = new Notification.Builder(getApplicationContext());
+        builder.setContentTitle("Capstone Design");
+        builder.setContentText("태그 감지 상태 입니다.");
+        builder.setSmallIcon(R.drawable.ic_launcher_foreground);
+        super.onCreate();
+    }
+
     //연결 여부에 따라 broadcast전송
     private final BluetoothGattCallback mGattCallBack = new BluetoothGattCallback() {
         @Override
@@ -51,11 +113,12 @@ public class BluetoothLeService extends Service {
                 intentAction = ACTION_GATT_CONNECTED;
                 mConnectionState = STATE_CONNECTED;
                 broadcastUpdate(intentAction);
-
+                tts.speak("블루투스 연결에 성공하였습니다.");
             }else if(newState == BluetoothProfile.STATE_DISCONNECTED){
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
                 broadcastUpdate(intentAction);
+                tts.speak("블루투스 연결이 해제되었습니다.");
             }
         }
 
@@ -133,12 +196,11 @@ public class BluetoothLeService extends Service {
     }
 
     //connects to the gatt server hosted on the bluetooth le device
-    public boolean connect(final String address){
+    public boolean connect(final String address, boolean bond){
         if(mBluetoothAdapter == null || address == null)
         {
             return false;
         }
-
         //이전에 연결되었던 디바이스, 연결을 재시도 함.
         if(mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress) && mBluetoothGatt != null){
             if(mBluetoothGatt.connect()){
@@ -157,6 +219,9 @@ public class BluetoothLeService extends Service {
             return false;
         }
 
+        if(bond) {
+            boolean isbond = device.createBond();
+        }
         mBluetoothGatt = device.connectGatt(this,true,mGattCallBack);
         mBluetoothDeviceAddress = address;
         mConnectionState = STATE_CONNECTING;
