@@ -12,6 +12,7 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -29,7 +30,6 @@ public class BluetoothLeService extends Service {
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
     private int mConnectionState = STATE_DISCONNECTED;
-
 
     private TTS tts;
 
@@ -51,8 +51,8 @@ public class BluetoothLeService extends Service {
     public final static String EXTRA_DATA =
             "com.a2013myway.team.capstonedesign.EXTRA_DATA";
 
-    //public final static UUID
-
+    private SharedPreferences preferences = null;
+    private SharedPreferences.Editor editor = null;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -62,36 +62,17 @@ public class BluetoothLeService extends Service {
         tts = new TTS(getApplicationContext(), Locale.KOREAN);
         boolean isconnect = false;
 
-        Log.d("onstartcommand 진입","진입");
-
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        // If there are paired devices
-
-        Log.d("bondnum",pairedDevices.size()+"");
-
-        if(pairedDevices.size()>0)
+        String savedMacAddress = preferences.getString("MAC",null);
+        if(savedMacAddress == null)
         {
-            for(BluetoothDevice device : pairedDevices){ //페어링된 장치 이름과, MAC주소를 가져올 수 있다.
-                if(device.getAddress().equals(DeviceAddress))
-                {
-                    isconnect = connect(device.getAddress(),false);
-                    break;
-                }
-                else
-                {
-                    isconnect = connect(DeviceAddress,true);
-                }
-            }
+            isconnect = connect(DeviceAddress);
         }
-        else{
-            //본딩된 기기가 없는 경우 연결 시 본딩할 수 있도록 함
-            isconnect = connect(DeviceAddress,true);
+        else
+        {
+            Log.d("진입","진입성공");
+            isconnect = connect(savedMacAddress);
         }
-
-
-
         Log.d("isconnect",isconnect+"");
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -101,6 +82,14 @@ public class BluetoothLeService extends Service {
         builder.setContentTitle("Capstone Design");
         builder.setContentText("태그 감지 상태 입니다.");
         builder.setSmallIcon(R.drawable.ic_launcher_foreground);
+
+        Notification notification = builder.build();
+
+        startForeground(1,notification);
+
+        preferences = getSharedPreferences("MacAddress",MODE_PRIVATE);
+        editor = preferences.edit();
+
         super.onCreate();
     }
 
@@ -196,7 +185,7 @@ public class BluetoothLeService extends Service {
     }
 
     //connects to the gatt server hosted on the bluetooth le device
-    public boolean connect(final String address, boolean bond){
+    public boolean connect(final String address){
         if(mBluetoothAdapter == null || address == null)
         {
             return false;
@@ -219,11 +208,12 @@ public class BluetoothLeService extends Service {
             return false;
         }
 
-        if(bond) {
-            boolean isbond = device.createBond();
-        }
         mBluetoothGatt = device.connectGatt(this,true,mGattCallBack);
         mBluetoothDeviceAddress = address;
+
+        editor.putString("MAC",mBluetoothDeviceAddress);
+        editor.commit();
+
         mConnectionState = STATE_CONNECTING;
         return true;
     }

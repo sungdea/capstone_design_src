@@ -41,7 +41,7 @@ public class ScanActivity extends AppCompatActivity {
     private android.os.Handler mHandler;
     private ListView mListView;
     private BluetoothLeScanner mBLEScanner;
-    private BluetoothLeService mBluetoothLeService;
+
     private String mDeviceName;
     private String mDeviceAddress;
 
