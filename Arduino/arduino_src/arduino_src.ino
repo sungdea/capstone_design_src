@@ -1,5 +1,5 @@
-#include <SoftwareSerial.h>
 #include <CurieBLE.h>
+#include <rfid.h>
 
 SoftwareSerial rSerial(2,3); // RX, TX
 
