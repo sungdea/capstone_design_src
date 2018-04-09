@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
@@ -39,6 +40,11 @@ public class BluetoothLeService extends Service {
 
     private String DeviceName;
     private String DeviceAddress = null;
+
+    private UUID SERVICE_UUID = UUID.fromString("03B80E5A-EDE8-4B33-A751-6CE34EC4C700");
+    private UUID DATA_UUID = UUID.fromString("7772E5DB-3868-4112-A1A9-F2669D106BF3");
+    //Client Characteristic Configuration
+    private UUID CCC = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
     public final static String ACTION_GATT_CONNECTED =
             "com.a2013myway.team.capstonedesign.ACTION_GATT_CONNECTED";
@@ -103,6 +109,8 @@ public class BluetoothLeService extends Service {
                 mConnectionState = STATE_CONNECTED;
                 broadcastUpdate(intentAction);
                 tts.speak("블루투스 연결에 성공하였습니다.");
+                gatt.getServices();
+
             }else if(newState == BluetoothProfile.STATE_DISCONNECTED){
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
@@ -115,19 +123,52 @@ public class BluetoothLeService extends Service {
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if(status == BluetoothGatt.GATT_SUCCESS){
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
+
+                //uuid 구현할것
+                //gatt.getServices를 통해 이 메소드로 넘어오는 것 대신 위에서 getService로 바로 uuid접근을 해도 되는 것인지
+                //1개의 서비스만을 정의하여 굳이 uuid 없이 services로 불러온 후 사용할 수 잇는지 확인
+                BluetoothGattService service = gatt.getService(SERVICE_UUID);
+
+                if(service == null)
+                {
+                    Log.d("service","서비스가 발견되지 않았습니다.");
+                    return;
+                }
+
+                //service uuid만 정하고 get 할 수 있는지 확인
+                BluetoothGattCharacteristic characteristic = service.getCharacteristic(DATA_UUID);
+
+                gatt.setCharacteristicNotification(characteristic,true);
+                BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CCC);
+                descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                gatt.writeDescriptor(descriptor);
             }
         }
 
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            if(status == BluetoothGatt.GATT_SUCCESS){
-                broadcastUpdate(ACTION_DATA_AVAILABLE,characteristic);
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
             }
-        }
+            byte[] data = characteristic.getValue();
+            if (data != null && data.length > 0) {
+                final StringBuilder stringBuilder = new StringBuilder(data.length);
+                for (byte byteChar : data)
+                    stringBuilder.append(String.format("%02X ", byteChar));
+                //intent.putExtra(EXTRA_DATA, new String(data) + "\n" + stringBuilder.toString());
 
+                Log.d("tagnum",stringBuilder.toString());
+                Toast.makeText(getApplicationContext(),stringBuilder.toString(),Toast.LENGTH_SHORT).show();
+                TTS tts = new TTS(getApplicationContext(),Locale.KOREAN);
+                tts.speak(stringBuilder.toString());
+            }
+
+        }
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             broadcastUpdate(ACTION_DATA_AVAILABLE,characteristic);
+
+            readCharacteristic(characteristic);
         }
     };
 
@@ -213,7 +254,6 @@ public class BluetoothLeService extends Service {
 
         editor.putString("MAC",mBluetoothDeviceAddress);
         editor.commit();
-
         mConnectionState = STATE_CONNECTING;
         return true;
     }
@@ -243,6 +283,7 @@ public class BluetoothLeService extends Service {
             return;
         }
         mBluetoothGatt.readCharacteristic(characteristic);
+
     }
 
     //enable or disables notification on a give characteristic
