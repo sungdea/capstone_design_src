@@ -31,7 +31,7 @@ SQLiteDatabase database = dbHelper.getReadableDatabase(); 로 이용
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    public static final String ROOT_DIR = "/data/data/com.a2013myway.team.capstonedesign/databases";
+    public static final String ROOT_DIR = "/data/data/com.a2013myway.team.capstonedesign/databases/";
     private static final String DATABASE_NAME = "capstoneDB.db";
     private static final int SCHEMA_VERSION = 1;
 
