@@ -26,11 +26,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".DetectService"
-            android:enabled="true"
-            android:exported="false" />
-
         <receiver
             android:name=".AutoRunReceiver"
             android:enabled="true"
@@ -38,14 +33,8 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
-
-                <data
-                    android:path="com.a2013myway.team.capstonedesign"
-                    android:scheme="package" />
             </intent-filter>
         </receiver>
-
-        <activity android:name=".DeviceControlActivity" />
 
         <service
             android:name=".BluetoothLeService"

@@ -9,10 +9,13 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -38,6 +41,9 @@ public class ScanActivity extends AppCompatActivity {
     private android.os.Handler mHandler;
     private ListView mListView;
     private BluetoothLeScanner mBLEScanner;
+
+    private String mDeviceName;
+    private String mDeviceAddress;
 
     private AlertDialog dialog;
 
@@ -80,29 +86,8 @@ public class ScanActivity extends AppCompatActivity {
             finish();
             return;
         }
-
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                final BluetoothDevice bluetoothDevice = mLeDeviceListAdapter.getDevice(i);
-
-                if(bluetoothDevice ==null)
-                    return;
-
-                final Intent intent = new Intent(ScanActivity.this,DeviceControlActivity.class);
-
-                intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_NAME,bluetoothDevice.getName());
-                intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_ADDRESS,bluetoothDevice.getAddress());
-
-                if(mScanning)
-                {
-                    mBLEScanner.stopScan(mLeScanCallback);
-                }
-
-            }
-        });
-
     }
+
 
     @Override
     protected void onResume() {
@@ -121,14 +106,14 @@ public class ScanActivity extends AppCompatActivity {
                 final BluetoothDevice device = mLeDeviceListAdapter.getDevice(i);
                 if(device == null)
                     return;
-                final Intent intent = new Intent(ScanActivity.this,DeviceControlActivity.class);
-                intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_NAME, device.getName());
-                intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
+                final Intent intent = new Intent(ScanActivity.this,BluetoothLeService.class);
+                intent.putExtra("Name", device.getName());
+                intent.putExtra("Address", device.getAddress());
                 if(mScanning){
                     mBLEScanner.stopScan(mLeScanCallback);
                 }
 
-                startActivity(intent);
+                startService(intent);
             }
         });
         scanLeDevice(true);

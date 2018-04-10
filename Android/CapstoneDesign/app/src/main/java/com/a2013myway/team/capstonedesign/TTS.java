@@ -22,7 +22,6 @@ public class TTS extends UtteranceProgressListener implements TextToSpeech.OnIni
     private TextToSpeech textToSpeech;
     private Locale locale;
     private Context context;
-    MediaPlayer mp;
 
     public TTS(Context context, Locale locale) {
         this.locale = locale;
@@ -89,7 +88,6 @@ public class TTS extends UtteranceProgressListener implements TextToSpeech.OnIni
                 switch (i)
                 {
                     case AudioManager.AUDIOFOCUS_GAIN:
-                        mp.pause();
                         //오디오 포커스 체인지 리스너 구현
                 }
             }
