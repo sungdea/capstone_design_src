@@ -2,6 +2,7 @@
 #define RFID_H
 
 #include "arduino.h"
+#include <SoftwareSerial.h>
 #include <string.h>
 
 const int tagLen = 16;  // RFID tag full length
@@ -18,7 +19,7 @@ class rfid
     rfid();
     boolean dataCheck();
     boolean charToHex();
-    void setID(char* id);
+    void readTag(SoftwareSerial &rSerial);
     char* getID();
     void printValue();
     void clearValue();
