@@ -196,7 +196,7 @@ public class BluetoothLeService extends Service {
                 stringBuilder.append((char)(data[i]));
 
             Log.d("tagnum",stringBuilder.toString());
-            Dit=new DataInfoTTS();
+            Dit=new DataInfoTTS(getApplicationContext());
             Dit.run(stringBuilder.toString());
 
             intent.putExtra("DATA",stringBuilder.toString());
