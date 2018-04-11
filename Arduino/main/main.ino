@@ -1,15 +1,14 @@
 #include <CurieBLE.h>
-#include <rfid.h>
+#include <SoftwareSerial.h>
+#include "rfid.h"
 
-SoftwareSerial rSerial(2,3); // RX, TX
+rfid module;
+unsigned char failConvert[idLen] = "XXXXXXXXXXXX";
+unsigned char invalidData[idLen] = "NNNNNNNNNNNN";
 
-const int tagLen = 16;  // RFID tag full length
-const int idLen = 13;   // RFID tag ID length
-
-unsigned char IDValue[idLen];
+SoftwareSerial rSerial(RX,TX); // RX, TX
 
 BLEService RFIDSvc("03B80E5A-EDE8-4B33-A751-6CE34EC4C700"); // create service
-
 // create switch characteristic and allow remote device to read
 BLECharacteristic IDChar("7772E5DB-3868-4112-A1A9-F2669D106BF3", BLENotify | BLERead,idLen);
 
@@ -30,16 +29,30 @@ void setup() {
 }
 
 void loop() {
+  char *id = NULL;
+  boolean flag = false;
   readTag();
 
-  if(strlen((char*)IDValue) == 0) return; // If there is no data to read, return
+  id = module.getID();
+  
+  if(strlen(id) == 0) return; // If there is no data to read, return
   else{
-    IDChar.setValue(IDValue,idLen);
+    module.printValue();
+    flag = module.charToHex();
+    if(!flag){
+      IDChar.setValue(failConvert,idLen);
+    }
+
+    module.printValue();
+    flag = module.dataCheck();
+    if(!flag){
+      IDChar.setValue(invalidData,idLen) ;
+    }
+    
+    IDChar.setValue((unsigned char*)id,idLen);
   }
   
-  for (int i=0; i < idLen; i++) {
-    IDValue[i] = 0;
-  }
+  module.clearValue();
 }
 
 void BLESetup()
@@ -59,7 +72,9 @@ void BLESetup()
   BLE.setEventHandler(BLEConnected, DeviceConnectHandler);
   BLE.setEventHandler(BLEDisconnected, DeviceDisconnectHandler);
 
-  IDChar.setValue(IDValue,idLen);
+  char *id = NULL;
+  id = module.getID();
+  IDChar.setValue((unsigned char*)id,idLen);
 }
 
 void DeviceConnectHandler(BLEDevice central) {
@@ -78,6 +93,7 @@ void readTag(){
   int i=0;
   int readByte;
   boolean tag = false;
+  char IDValue[idLen] = { 0 };
   
   if(rSerial.available() == tagLen) tag = true; // RFID tag가 맞는지 확인
   
@@ -93,5 +109,7 @@ void readTag(){
         i++;
         }
     }
+     module.setID(IDValue);
   }
+ 
 }
