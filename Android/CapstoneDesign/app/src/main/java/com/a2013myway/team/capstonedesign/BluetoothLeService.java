@@ -19,6 +19,7 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -86,6 +87,12 @@ public class BluetoothLeService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
     @Override
     public void onCreate() {
         Notification.Builder builder = new Notification.Builder(getApplicationContext());
@@ -141,6 +148,8 @@ public class BluetoothLeService extends Service {
                 if(service == null)
                 {
                     Log.d("service","서비스가 발견되지 않았습니다.");
+                    tts.speak("잘못된 블루투스 장치와 연결되어 연결을 해제합니다.");
+                    disconnect();
                     return;
                 }
 
@@ -195,29 +204,6 @@ public class BluetoothLeService extends Service {
         sendBroadcast(intent);
     }
 
-    public class LocalBinder extends Binder{
-        BluetoothLeService getService(){
-            return BluetoothLeService.this;
-        }
-    }
-
-    public BluetoothLeService() {
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        return mBinder;
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        close();
-        return super.onUnbind(intent);
-    }
-
-    private final IBinder mBinder = new LocalBinder();
-
     //블루투스 어댑터와 블루투스 매니저 할당
     public boolean initialize(){
         if(mBluetoothManager == null){
@@ -240,6 +226,7 @@ public class BluetoothLeService extends Service {
         {
             return false;
         }
+
         //이전에 연결되었던 디바이스, 연결을 재시도 함.
         if(mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress) && mBluetoothGatt != null){
             if(mBluetoothGatt.connect()){
@@ -258,8 +245,10 @@ public class BluetoothLeService extends Service {
             return false;
         }
 
+
         mBluetoothGatt = device.connectGatt(this,true,mGattCallBack);
         mBluetoothDeviceAddress = address;
+
 
         editor.putString("MAC",mBluetoothDeviceAddress);
         editor.commit();
@@ -274,6 +263,7 @@ public class BluetoothLeService extends Service {
             return;
         }
         mBluetoothGatt.disconnect();
+        close();
     }
 
     //ble 디바이스를 이용한 후 app must call this method to ensure resources are released properly
