@@ -62,6 +62,7 @@ public class BluetoothLeService extends Service {
 
     private SharedPreferences preferences = null;
     private SharedPreferences.Editor editor = null;
+    private DataInfoTTS Dit;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -186,6 +187,8 @@ public class BluetoothLeService extends Service {
                 stringBuilder.append((char)(data[i]));
 
             Log.d("tagnum",stringBuilder.toString());
+            Dit=new DataInfoTTS();
+            Dit.run(stringBuilder.toString());
 
             intent.putExtra("DATA",stringBuilder.toString());
         }
