@@ -13,11 +13,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +49,9 @@ public class ScanActivity extends AppCompatActivity {
 
     private AlertDialog dialog;
 
+    private SharedPreferences preferences = null;
+    private SharedPreferences.Editor editor = null;
+
     private final int REQUEST_ENABLE_BT = 1;
     //Stop scanning after 10 sec
     private static final long SCAN_PERIOD = 10000;
@@ -59,6 +64,9 @@ public class ScanActivity extends AppCompatActivity {
         mListView = (ListView)findViewById(R.id.lv_scan);
         dialog = new SpotsDialog(this,R.style.Custom);
         mListView.setEmptyView(findViewById(R.id.emptyview));
+
+        preferences = getSharedPreferences("MacAddress",MODE_PRIVATE);
+        editor = preferences.edit();
 
         //BLE를 지원하는지 확인
         if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE))
@@ -112,7 +120,11 @@ public class ScanActivity extends AppCompatActivity {
                 if(mScanning){
                     mBLEScanner.stopScan(mLeScanCallback);
                 }
-
+                String s = preferences.getString("MAC","");
+                Log.d("MAC",s);
+                editor.remove("MAC").commit();
+                s = preferences.getString("MAC","사라짐");
+                Log.d("MAC2",s);
                 startService(intent);
             }
         });
@@ -159,8 +171,6 @@ public class ScanActivity extends AppCompatActivity {
 
             mScanning = true;
             mBLEScanner.startScan(mLeScanCallback);
-
-
         }
         else
         {
