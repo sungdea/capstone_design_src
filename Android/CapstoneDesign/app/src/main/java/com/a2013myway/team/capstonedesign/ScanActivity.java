@@ -13,6 +13,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.IBinder;
@@ -46,6 +47,9 @@ public class ScanActivity extends AppCompatActivity {
     private String mDeviceAddress;
 
     private AlertDialog dialog;
+
+    private SharedPreferences preferences = null;
+    private SharedPreferences.Editor editor = null;
 
     private final int REQUEST_ENABLE_BT = 1;
     //Stop scanning after 10 sec
@@ -86,6 +90,9 @@ public class ScanActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        preferences = getSharedPreferences("MacAddress",MODE_PRIVATE);
+        editor = preferences.edit();
     }
 
 
@@ -104,6 +111,7 @@ public class ScanActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final BluetoothDevice device = mLeDeviceListAdapter.getDevice(i);
+
                 if(device == null)
                     return;
                 final Intent intent = new Intent(ScanActivity.this,BluetoothLeService.class);

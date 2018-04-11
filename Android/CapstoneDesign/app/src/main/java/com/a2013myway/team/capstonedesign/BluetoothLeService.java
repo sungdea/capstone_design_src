@@ -15,6 +15,8 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -62,7 +64,8 @@ public class BluetoothLeService extends Service {
 
     private SharedPreferences preferences = null;
     private SharedPreferences.Editor editor = null;
-
+    private DBHelper dbHelper = null;
+    private SQLiteDatabase database = null;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         DeviceName = intent.getStringExtra("Name");
@@ -99,6 +102,9 @@ public class BluetoothLeService extends Service {
         //MAC주소 불러오기
         preferences = getSharedPreferences("MacAddress",MODE_PRIVATE);
         editor = preferences.edit();
+
+        dbHelper = new DBHelper(getBaseContext());
+        database = dbHelper.getReadableDatabase();
 
         super.onCreate();
     }
@@ -186,7 +192,12 @@ public class BluetoothLeService extends Service {
                 stringBuilder.append((char)(data[i]));
 
             Log.d("tagnum",stringBuilder.toString());
-
+            Cursor c=database.rawQuery("select sentence from lBlock where id = "+"'"+stringBuilder.toString()+"'",null);
+            c.moveToNext();
+            String text = "";
+            text = c.getString(0);
+            Log.d("text",text);
+            tts.speak(text);
             intent.putExtra("DATA",stringBuilder.toString());
         }
         sendBroadcast(intent);
