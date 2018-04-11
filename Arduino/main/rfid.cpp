@@ -7,7 +7,7 @@ rfid::rfid(){
    checksum = 0;
 }
 
-/*void rfid::readTag(SoftwareSerial rSerial){
+void rfid::readTag(SoftwareSerial &rSerial){
   int i=0;
   int readByte;
   boolean tag = false;
@@ -21,7 +21,7 @@ rfid::rfid(){
         /* first one byte and last three byte skip.
            first one byte(0x02) is STX/start of text, last three byte is CR/carrige return(0x13),
            LF/linefeed(0x10), ETX/end of text. */
-        /*if (readByte != 2 && readByte!= 13 && readByte != 10 && readByte != 3) {
+        if (readByte != 2 && readByte!= 13 && readByte != 10 && readByte != 3) {
         IDValue[i] = readByte;
         i++;
         }
@@ -29,7 +29,7 @@ rfid::rfid(){
      Serial.println("read tag.");
   }
  
-}*/
+}
 
 boolean rfid::dataCheck(){
   int tmp = 0,i;
@@ -68,10 +68,6 @@ boolean rfid::charToHex() {
     }
   }
   return true;
-}
-
-void rfid::setID(char* id){
- strncpy(IDValue, id, idLen);
 }
 
 char* rfid::getID(){
