@@ -30,22 +30,33 @@ public class DataInfoTTS{
         database = dbHelper.getReadableDatabase();
         tts=new TTS(context, Locale.KOREAN);
         isTouchedStop = false;
+        timer = new Timer();
+        mTask = new TimerTask() {
+            @Override
+            public void run() {
+                isTouchedStop = false;
+                Log.d("touch여부",isTouchedStop+"");
+            }
+        };
     }
 
     public void run(String id){
 
         int type;
 
-        Cursor StopBlockCursor = database.rawQuery("select * from StopBlock where tagNum = '"+id+"'",null);
-        Cursor LinearBlockCursor = database.rawQuery("select * from LinearBlock where tagNum = '"+id+"'",null);
+        Cursor StopBlockCursor = database.rawQuery("select * from `StopBlock` where tagNum = '"+id+"'",null);
+        Cursor LinearBlockCursor = database.rawQuery("select * from `LinearBlock` where tagNum = '"+id+"'",null);
 
-        if(StopBlockCursor == null &&StopBlockCursor.getCount() == 0)
+        if(StopBlockCursor.getCount()!=0)
         {
-            type = LINEAR_BLOCK;
-        }
-        else if(LinearBlockCursor == null &&LinearBlockCursor.getCount() == 0)
-        {
+            Log.d("LinearBlock","진입");
+
             type = STOP_BLOCK;
+        }
+        else if(LinearBlockCursor.getCount() != 0)
+            {
+                Log.d("StopBlock","진입");
+                type = LINEAR_BLOCK;
         }
         else
         {
@@ -58,45 +69,55 @@ public class DataInfoTTS{
         switch (type)
         {
             case STOP_BLOCK:
+                StopBlockCursor.moveToNext();
                 location = StopBlockCursor.getString(2);
+                tts.stop();
                 tts.speak("현재 위치는 "+location+"입니다.");
                 isTouchedStop = true;
-                statusChange(false);
+                timer.cancel();
+                mTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        isTouchedStop = false;
+                        Log.d("touch여부",isTouchedStop+"");
+                    }
+                };
+                timer.schedule(mTask,15000);
+                Log.d("touch여뷰",isTouchedStop+"");
                 break;
             case LINEAR_BLOCK:
+                LinearBlockCursor.moveToNext();
+                Log.d("리니어 블록에서 touch",isTouchedStop+"");
                 if(isTouchedStop)
                 {
-                    Cursor LinearBlockInfoCursor = database.rawQuery("select * from LinearBlockInfo where tagNum = '"+id+"'",null);
-                    location = LinearBlockInfoCursor.getString(1);
-                    distance = LinearBlockInfoCursor.getString(2);
+                    //Cursor LinearBlockInfoCursor = database.rawQuery("select * from LinearBlockInfo where tagNum = '"+id+"'",null);
+                    location = LinearBlockCursor.getString(3);
+                    //distance = LinearBlockInfoCursor.getString(2);
+                    tts.stop();
+                    //tts.speak("해당 방향으로 "+distance+"미터 앞에"+location+" 위치해 있습니다.");
+                    tts.speak("해당 방향으로 " +location +"이 있습니다.");
 
-                    tts.speak("해당 방향으로 "+distance+"미터 앞에"+location+" 위치해 있습니다.");
-                    statusChange(false);
+                    timer.cancel();
+                    mTask = new TimerTask() {
+                        @Override
+                        public void run() {
+                            isTouchedStop = false;
+                            Log.d("touch여부",isTouchedStop+"");
+                        }
+                    };
+                    timer.schedule(mTask,15000);
                 }
                 else
                 {
+                    tts.stop();
                     tts.speak("정지블록을 먼저 태그해 주세요.");
                 }
                 break;
             default:
+                tts.stop();
                 tts.speak("태그를 다시 인식하여 주세요.");
                 break;
         }
 
-    }
-    private void statusChange(final boolean touchedStop)
-    {
-        mTask.cancel();
-
-        timer = new Timer();
-        mTask = new TimerTask() {
-            @Override
-            public void run() {
-                isTouchedStop = touchedStop;
-
-            }
-        };
-
-        timer.schedule(mTask,15000);
     }
 }
