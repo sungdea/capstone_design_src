@@ -1,18 +1,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="10dp">
 
-    <Button
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:text="블루투스 연결"
-        android:id="@+id/btn_connect"/>
+    <ImageButton
+        android:id="@+id/btn_search"
+        android:layout_width="214dp"
+        android:layout_height="54dp"
+        android:layout_gravity="center"
+        android:background="@drawable/ripple_effect"
+        android:padding="0dp"
+        android:scaleType="fitCenter"
+      />
 
-    <Button
-        android:id="@+id/speak_btn"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:text="speak" />
 </LinearLayout>

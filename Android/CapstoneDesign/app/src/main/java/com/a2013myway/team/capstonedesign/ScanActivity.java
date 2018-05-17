@@ -44,9 +44,6 @@ public class ScanActivity extends AppCompatActivity {
     private ListView mListView;
     private BluetoothLeScanner mBLEScanner;
 
-    private String mDeviceName;
-    private String mDeviceAddress;
-
     private AlertDialog dialog;
 
     private SharedPreferences preferences = null;
