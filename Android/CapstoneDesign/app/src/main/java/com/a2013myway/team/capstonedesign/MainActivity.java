@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.util.Locale;
@@ -41,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
 
     private BluetoothAdapter bluetoothAdapter;
     private final int ENABLE_BT = 1;
-    private TTS tts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent,ENABLE_BT);
         }
 
-        Button button = (Button)findViewById(R.id.btn_connect);
+        ImageButton button = (ImageButton)findViewById(R.id.btn_search);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,15 +80,7 @@ public class MainActivity extends AppCompatActivity {
                 builder.show();
             }
         }
-        //tts speak example
-        tts=new TTS(this,Locale.KOREAN);
-        Button tts_btn=(Button)findViewById(R.id.speak_btn);
-        tts_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tts.speak("안녕하세요");
-            }
-        });
+
 
     }
 
