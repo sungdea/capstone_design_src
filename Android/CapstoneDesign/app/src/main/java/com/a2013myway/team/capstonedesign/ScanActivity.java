@@ -19,6 +19,7 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,9 +44,6 @@ public class ScanActivity extends AppCompatActivity {
     private ListView mListView;
     private BluetoothLeScanner mBLEScanner;
 
-    private String mDeviceName;
-    private String mDeviceAddress;
-
     private AlertDialog dialog;
 
     private SharedPreferences preferences = null;
@@ -63,6 +61,9 @@ public class ScanActivity extends AppCompatActivity {
         mListView = (ListView)findViewById(R.id.lv_scan);
         dialog = new SpotsDialog(this,R.style.Custom);
         mListView.setEmptyView(findViewById(R.id.emptyview));
+
+        preferences = getSharedPreferences("MacAddress",MODE_PRIVATE);
+        editor = preferences.edit();
 
         //BLE를 지원하는지 확인
         if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE))
@@ -90,9 +91,6 @@ public class ScanActivity extends AppCompatActivity {
             finish();
             return;
         }
-
-        preferences = getSharedPreferences("MacAddress",MODE_PRIVATE);
-        editor = preferences.edit();
     }
 
 
@@ -111,7 +109,6 @@ public class ScanActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final BluetoothDevice device = mLeDeviceListAdapter.getDevice(i);
-
                 if(device == null)
                     return;
                 final Intent intent = new Intent(ScanActivity.this,BluetoothLeService.class);
@@ -120,7 +117,11 @@ public class ScanActivity extends AppCompatActivity {
                 if(mScanning){
                     mBLEScanner.stopScan(mLeScanCallback);
                 }
-
+                String s = preferences.getString("MAC","");
+                Log.d("MAC",s);
+                editor.remove("MAC").commit();
+                s = preferences.getString("MAC","사라짐");
+                Log.d("MAC2",s);
                 startService(intent);
             }
         });
@@ -167,8 +168,6 @@ public class ScanActivity extends AppCompatActivity {
 
             mScanning = true;
             mBLEScanner.startScan(mLeScanCallback);
-
-
         }
         else
         {
