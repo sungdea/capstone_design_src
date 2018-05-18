@@ -36,14 +36,14 @@ public class DataInfoTTS{
 
         int type;
 
-        Cursor StopBlockCursor = database.rawQuery("select * from StopBlock where tagNum = '"+id+"'",null);
-        Cursor LinearBlockCursor = database.rawQuery("select * from LinearBlock where tagNum = '"+id+"'",null);
+        Cursor StopBlockCursor = database.rawQuery("select * from `StopBlock` where tagNum = '"+id+"'",null);
+        Cursor LinearBlockCursor = database.rawQuery("select * from `LinearBlock` where tagNum = '"+id+"'",null);
 
-        if(StopBlockCursor == null &&StopBlockCursor.getCount() == 0)
+        if(StopBlockCursor.getCount() == 0)
         {
             type = LINEAR_BLOCK;
         }
-        else if(LinearBlockCursor == null &&LinearBlockCursor.getCount() == 0)
+        else if(LinearBlockCursor.getCount() == 0)
         {
             type = STOP_BLOCK;
         }
@@ -52,33 +52,38 @@ public class DataInfoTTS{
             type = ERROR;
         }
 
-        String location;
-        String distance;
+        String stop_info;
+        String line_info;
 
         switch (type)
         {
             case STOP_BLOCK:
-                location = StopBlockCursor.getString(2);
-                tts.speak("현재 위치는 "+location+"입니다.");
+                StopBlockCursor.moveToFirst();
+                stop_info = StopBlockCursor.getString(2);
+                Log.d("stop_info",stop_info);
+                tts.stop();
+                tts.speak(stop_info);
                 isTouchedStop = true;
-                statusChange(false);
+                //statusChange(false);
                 break;
             case LINEAR_BLOCK:
                 if(isTouchedStop)
                 {
-                    Cursor LinearBlockInfoCursor = database.rawQuery("select * from LinearBlockInfo where tagNum = '"+id+"'",null);
-                    location = LinearBlockInfoCursor.getString(1);
-                    distance = LinearBlockInfoCursor.getString(2);
-
-                    tts.speak("해당 방향으로 "+distance+"미터 앞에"+location+" 위치해 있습니다.");
-                    statusChange(false);
+                    LinearBlockCursor.moveToFirst();
+                    line_info = LinearBlockCursor.getString(3);
+                    Log.d("line_info",line_info);
+                    tts.stop();
+                    tts.speak(line_info);
+                    //statusChange(false);
                 }
                 else
                 {
+                    tts.stop();
                     tts.speak("정지블록을 먼저 태그해 주세요.");
                 }
                 break;
             default:
+                tts.stop();
                 tts.speak("태그를 다시 인식하여 주세요.");
                 break;
         }
