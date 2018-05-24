@@ -20,6 +20,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -182,7 +183,8 @@ public class BluetoothLeService extends Service {
 
     private void broadcastUpdate(final String action){
         final Intent intent = new Intent(action);
-        sendBroadcast(intent);
+        //sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     //프로파일 handling
