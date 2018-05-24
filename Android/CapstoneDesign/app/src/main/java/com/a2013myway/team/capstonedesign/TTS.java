@@ -21,6 +21,7 @@ public class TTS extends UtteranceProgressListener implements TextToSpeech.OnIni
     private TextToSpeech textToSpeech;
     private Locale locale;
     private Context context;
+    private int call_state=0;
 
     public TTS(Context context, Locale locale) {
         this.locale = locale;
@@ -32,7 +33,7 @@ public class TTS extends UtteranceProgressListener implements TextToSpeech.OnIni
 
     public void speak(String text) {
         TTSFocus(context);
-        if(textToSpeech != null) {
+        if(textToSpeech != null && call_state==0 ) {
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 String myUtteranceID = "myUtteranceID";
                 textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, myUtteranceID);
@@ -55,6 +56,10 @@ public class TTS extends UtteranceProgressListener implements TextToSpeech.OnIni
 
     public boolean isSpeaking() {
         return textToSpeech.isSpeaking();
+    }
+
+    public void call_state(int state){
+        call_state=state;
     }
 
     @Override
@@ -88,6 +93,7 @@ public class TTS extends UtteranceProgressListener implements TextToSpeech.OnIni
                 {
                     case AudioManager.AUDIOFOCUS_GAIN:
                         //오디오 포커스 체인지 리스너 구현
+                        break;
                 }
             }
         },AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
