@@ -86,6 +86,7 @@ public class BluetoothLeService extends Service {
             isconnect = connect(savedMacAddress);
         }
         Log.d("isconnect",isconnect+"");
+        Dit=new DataInfoTTS(getApplicationContext());
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -198,7 +199,7 @@ public class BluetoothLeService extends Service {
                 stringBuilder.append((char)(data[i]));
 
             Log.d("tagnum",stringBuilder.toString());
-            Dit=new DataInfoTTS(getApplicationContext());
+
             Dit.run(stringBuilder.toString());
 
             intent.putExtra("DATA",stringBuilder.toString());

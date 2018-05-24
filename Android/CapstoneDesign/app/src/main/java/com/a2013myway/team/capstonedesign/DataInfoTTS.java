@@ -27,22 +27,12 @@ public class DataInfoTTS{
     //일정 시간 이내에 정지블록을 touch 하였었는가?
     private boolean isTouchedStop;
 
-    private TimerTask mTask;
-    private Timer timer;
-
     public DataInfoTTS(Context context){
         dbHelper = new DBHelper(context);
         database = dbHelper.getReadableDatabase();
         tts=new TTS(context, Locale.KOREAN);
         isTouchedStop = false;
-        timer = new Timer();
-        mTask = new TimerTask() {
-            @Override
-            public void run() {
-                isTouchedStop = false;
-                Log.d("touch여부",isTouchedStop+"");
-            }
-        };
+
     }
 
     public void run(String id){
@@ -81,6 +71,7 @@ public class DataInfoTTS{
                 stopTime = (int)System.currentTimeMillis();
 
                 tagIndex = StopBlockCursor.getString(0);
+                Log.d("tagindex",tagIndex);
                 Log.d("touch여뷰",isTouchedStop+"");
                 break;
             case LINEAR_BLOCK:
@@ -90,8 +81,6 @@ public class DataInfoTTS{
                 String stopTagNum = LinearBlockCursor.getString(2);
 
                 boolean isclosed = tagIndex.equals(stopTagNum);
-                Log.d("stoptagnum",stopTagNum);
-                Log.d("tagindex",tagIndex);
 
                 linearTime = (int)System.currentTimeMillis();
                 int deviation = linearTime-stopTime;

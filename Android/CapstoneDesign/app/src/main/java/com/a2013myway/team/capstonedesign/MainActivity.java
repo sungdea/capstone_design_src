@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent,ENABLE_BT);
         }
 
-        ImageButton button = (ImageButton)findViewById(R.id.btn_search);
+        ImageButton button = findViewById(R.id.btn_search);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+
 
         //PERMISSION CHECK
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
