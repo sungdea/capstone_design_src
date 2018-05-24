@@ -11,7 +11,7 @@
      limitations under the License.
 -->
 <resources>
-    <string name="app_name">CapstoneDesign</string>
+    <string name="app_name">NaviCane</string>
     <string name="label_data">Data:</string>
     <string name="label_device_address">Device address:</string>
     <string name="label_state">State:</string>
