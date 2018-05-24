@@ -2,9 +2,14 @@
 #include <SoftwareSerial.h>
 #include "rfid.h"
 
+#define SCSS_RSTC 0x570
+#define RSTC_WARM_RESET (1 << 1)
+#define RESET 7
+
 rfid module;
 unsigned char failConvert[idLen] = "XXXXXXXXXXXX";
 unsigned char invalidData[idLen] = "NNNNNNNNNNNN";
+int rst = 0;
 
 SoftwareSerial rSerial(RX,TX); // RX, TX
 
@@ -16,11 +21,13 @@ void readTag();
 void BLESetup();
 void DeviceConnectHandler(BLEDevice central);
 void DeviceDisconnectHandler(BLEDevice central);
+void reboot(void);
 
 void setup() {
   Serial.begin(9600);
   rSerial.begin(9600);
- 
+  
+  pinMode(RESET, INPUT);
   BLESetup();
   
   // advertise the service
@@ -31,6 +38,10 @@ void setup() {
 void loop() {
   char *id = NULL;
   boolean flag = false;
+
+  rst = digitalRead(RESET);
+  if(rst) reboot();
+  
   module.readTag(rSerial);
 
   id = module.getID();
@@ -87,5 +98,11 @@ void DeviceDisconnectHandler(BLEDevice central) {
   // central disconnected event handler
   Serial.print("Disconnected event, central: ");
   Serial.println(central.address());
+}
+
+void reboot(void)
+{
+  SCSS_REG_VAL(SCSS_SS_CFG) |= ARC_HALT_REQ_A;
+  SCSS_REG_VAL(SCSS_RSTC) = RSTC_WARM_RESET;
 }
 
