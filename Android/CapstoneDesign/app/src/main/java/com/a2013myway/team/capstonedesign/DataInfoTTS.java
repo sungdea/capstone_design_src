@@ -15,10 +15,15 @@ public class DataInfoTTS{
     private final int STOP_BLOCK = 0;
     private final int ERROR = 2;
 
+    private int stopTime;
+    private int linearTime;
+
     private DBHelper dbHelper;
     private SQLiteDatabase database;
     private TTS tts;
-    private Cursor cursor;
+
+    private String tagIndex;
+
     //일정 시간 이내에 정지블록을 touch 하였었는가?
     private boolean isTouchedStop;
 
@@ -30,6 +35,14 @@ public class DataInfoTTS{
         database = dbHelper.getReadableDatabase();
         tts=new TTS(context, Locale.KOREAN);
         isTouchedStop = false;
+        timer = new Timer();
+        mTask = new TimerTask() {
+            @Override
+            public void run() {
+                isTouchedStop = false;
+                Log.d("touch여부",isTouchedStop+"");
+            }
+        };
     }
 
     public void run(String id){
@@ -39,42 +52,55 @@ public class DataInfoTTS{
         Cursor StopBlockCursor = database.rawQuery("select * from `StopBlock` where tagNum = '"+id+"'",null);
         Cursor LinearBlockCursor = database.rawQuery("select * from `LinearBlock` where tagNum = '"+id+"'",null);
 
-        if(StopBlockCursor.getCount() == 0)
+        if(StopBlockCursor.getCount()!=0)
         {
-            type = LINEAR_BLOCK;
-        }
-        else if(LinearBlockCursor.getCount() == 0)
-        {
+            Log.d("LinearBlock","진입");
+
             type = STOP_BLOCK;
+        }
+        else if(LinearBlockCursor.getCount() != 0)
+        {
+            Log.d("StopBlock","진입");
+            type = LINEAR_BLOCK;
         }
         else
         {
             type = ERROR;
         }
 
-        String stop_info;
-        String line_info;
+        String location;
 
         switch (type)
         {
             case STOP_BLOCK:
-                StopBlockCursor.moveToFirst();
-                stop_info = StopBlockCursor.getString(2);
-                Log.d("stop_info",stop_info);
+                StopBlockCursor.moveToNext();
+                location = StopBlockCursor.getString(2);
                 tts.stop();
-                tts.speak(stop_info);
+                tts.speak(location);
                 isTouchedStop = true;
-                //statusChange(false);
+                stopTime = (int)System.currentTimeMillis();
+
+                tagIndex = StopBlockCursor.getString(0);
+                Log.d("touch여뷰",isTouchedStop+"");
                 break;
             case LINEAR_BLOCK:
-                if(isTouchedStop)
+                LinearBlockCursor.moveToNext();
+                Log.d("리니어 블록에서 touch",isTouchedStop+"");
+                location = LinearBlockCursor.getString(3);
+                String stopTagNum = LinearBlockCursor.getString(2);
+
+                boolean isclosed = tagIndex.equals(stopTagNum);
+                Log.d("stoptagnum",stopTagNum);
+                Log.d("tagindex",tagIndex);
+
+                linearTime = (int)System.currentTimeMillis();
+                int deviation = linearTime-stopTime;
+                Log.d("시간 차이",deviation+"");
+                if(deviation<15000 && isclosed)
                 {
-                    LinearBlockCursor.moveToFirst();
-                    line_info = LinearBlockCursor.getString(3);
-                    Log.d("line_info",line_info);
+                    stopTime = linearTime;
                     tts.stop();
-                    tts.speak(line_info);
-                    //statusChange(false);
+                    tts.speak(location);
                 }
                 else
                 {
@@ -88,20 +114,5 @@ public class DataInfoTTS{
                 break;
         }
 
-    }
-    private void statusChange(final boolean touchedStop)
-    {
-        mTask.cancel();
-
-        timer = new Timer();
-        mTask = new TimerTask() {
-            @Override
-            public void run() {
-                isTouchedStop = touchedStop;
-
-            }
-        };
-
-        timer.schedule(mTask,15000);
     }
 }

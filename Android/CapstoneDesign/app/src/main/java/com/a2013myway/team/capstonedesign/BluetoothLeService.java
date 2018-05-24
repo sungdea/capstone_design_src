@@ -104,9 +104,6 @@ public class BluetoothLeService extends Service {
 
         Notification notification = builder.build();
 
-        TelephonyManager manager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        manager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-
         startForeground(1,notification);
 
         //MAC주소 불러오기
@@ -115,26 +112,6 @@ public class BluetoothLeService extends Service {
 
         super.onCreate();
     }
-
-    private PhoneStateListener phoneStateListener = new PhoneStateListener()
-    {
-        public void onCallStateChanged(int state, String incomingNumber)
-        {
-            switch(state){
-                case TelephonyManager.CALL_STATE_RINGING:
-                    tts.call_state(1);
-                    tts.stop();
-                    break;
-                case TelephonyManager.CALL_STATE_OFFHOOK:
-                    tts.stop();
-                    tts.call_state(1);
-                    break;
-                case TelephonyManager.CALL_STATE_IDLE:
-                    tts.call_state(0);
-                    break;
-            }
-        };
-    };
 
     //연결 여부에 따라 broadcast전송
     private final BluetoothGattCallback mGattCallBack = new BluetoothGattCallback() {
