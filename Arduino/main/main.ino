@@ -21,7 +21,13 @@ void readTag();
 void BLESetup();
 void DeviceConnectHandler(BLEDevice central);
 void DeviceDisconnectHandler(BLEDevice central);
-void reboot(void);
+
+void reboot(void)
+{
+  Serial.println("Reboot...");
+  SCSS_REG_VAL(SCSS_SS_CFG) |= ARC_HALT_REQ_A;
+  SCSS_REG_VAL(SCSS_RSTC) = RSTC_WARM_RESET;
+}
 
 void setup() {
   Serial.begin(9600);
@@ -33,6 +39,7 @@ void setup() {
   // advertise the service
   BLE.advertise();
   Serial.println(("Bluetooth device active, waiting for connections..."));
+
 }
 
 void loop() {
@@ -40,7 +47,9 @@ void loop() {
   boolean flag = false;
 
   rst = digitalRead(RESET);
-  if(rst) reboot();
+  if(rst == 1) {
+    reboot();  
+  }
   
   module.readTag(rSerial);
 
@@ -100,9 +109,4 @@ void DeviceDisconnectHandler(BLEDevice central) {
   Serial.println(central.address());
 }
 
-void reboot(void)
-{
-  SCSS_REG_VAL(SCSS_SS_CFG) |= ARC_HALT_REQ_A;
-  SCSS_REG_VAL(SCSS_RSTC) = RSTC_WARM_RESET;
-}
 
